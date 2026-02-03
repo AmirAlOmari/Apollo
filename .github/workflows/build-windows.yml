@@ -59,10 +59,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Apollo-Windows-Installer
-          path: ./*.exe
+          path: ./build/cpack_artifacts/*.exe
 
       - name: Upload Portable
         uses: actions/upload-artifact@v4
         with:
           name: Apollo-Windows-Portable
-          path: ./*.zip
+          path: ./build/cpack_artifacts/*.zip
