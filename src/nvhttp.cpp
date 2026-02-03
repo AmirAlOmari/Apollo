@@ -19,6 +19,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <Simple-Web-Server/server_http.hpp>
+#include <openssl/ssl.h>
 
 // local includes
 #include "config.h"
@@ -70,9 +71,14 @@ namespace nvhttp {
     SunshineHTTPSServer(const std::string &certification_file, const std::string &private_key_file):
         ServerBase<SunshineHTTPS>::ServerBase(443),
         context(boost::asio::ssl::context::tls_server) {
-      // Disabling TLS 1.0 and 1.1 (see RFC 8996)
-      context.set_options(boost::asio::ssl::context::no_tlsv1);
-      context.set_options(boost::asio::ssl::context::no_tlsv1_1);
+      // LEGACY TLS SUPPORT: Allow TLS 1.0 and 1.1 for Android 5.1.1 compatibility
+      // Original code disabled these for RFC 8996 compliance:
+      // context.set_options(boost::asio::ssl::context::no_tlsv1);
+      // context.set_options(boost::asio::ssl::context::no_tlsv1_1);
+      
+      // Enable legacy ciphers for older clients
+      SSL_CTX_set_cipher_list(context.native_handle(), "ALL:!aNULL:!eNULL:@SECLEVEL=0");
+      
       context.use_certificate_chain_file(certification_file);
       context.use_private_key_file(private_key_file, boost::asio::ssl::context::pem);
     }
